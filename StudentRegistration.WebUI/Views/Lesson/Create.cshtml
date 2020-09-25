@@ -1,0 +1,99 @@
+﻿@model LessonDto
+
+@{
+    ViewData["Title"] = "Create";
+    string errorMessage = (string)ViewBag.ErrorMessage;
+}
+
+@if (errorMessage != null)
+{
+    <div class="border border-dark p-3 mb-2">
+        <strong style="color:red">
+            @errorMessage
+        </strong>
+    </div>
+}
+
+<div class="main-w3pvt mian-content-wthree text-center">
+    <div class="container">
+        <br />
+        <hr />
+        <div class="row">
+            <div class="col-md-4" style="left:30%; right:30%">
+                <form method="post" asp-action="Create">
+                    <div class="form-group">
+                        <label asp-for="LessonName" class="control-label">Ders İsim</label>
+                        <input asp-for="LessonName" type="text" id="lessonName" class="form-control" placeholder="Ders İsmi" value="" />
+                        <p id="lessonNameErrorMessage" style="color:red"> </p>
+                        <span asp-validation-for="LessonName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="FkGradeId">Sınıf İsimleri</label>
+                        <select asp-for="FkGradeId" id="gradeList" class="form-control">
+                        </select>
+                        <p id="gradeIdErrorMessage" style="color:red"> </p>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="add_Btn" class="btn btn-block btn-info">Kaydet</button>
+                    </div>
+                    <div>
+                        <a asp-controller="Lesson" asp-action="GetAll" class="btn btn-warning">Ders Listesi</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.getJSON("/Grade/GetAllGrades", null, function (data) {
+                var item = "";
+                $("#gradeList").empty();
+
+                item += '<option value="0">-- Sınıf İsmi Seçiniz --</option>';
+                $.each(data, function (i, parfume) {
+                    item += '<option value="' + parfume.value + '">' + parfume.text + '</option>'
+                });
+
+                $("#gradeList").show();
+                $("#gradeList").html(item);
+            });
+
+        });
+
+        $(document).on('click', '#add_Btn', function (e) {
+
+            var lessonName = $("#lessonName").val();
+            var gradeList = $("#gradeList").val();
+
+            if (lessonName == "" && (gradeList == "" || gradeList <= 0)) {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "Ders İsmi Boş Geçilemez...";
+                document.getElementById("gradeIdErrorMessage").innerHTML = "Doğru bir sınıf ismi giriniz ...";
+                return false;
+            }
+            else {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "";
+                document.getElementById("gradeIdErrorMessage").innerHTML = "";
+            }
+            if (lessonName == "") {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "Ders İsmi Boş Geçilemez...";
+                return false;
+            }
+            else {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "";
+            }
+            if (gradeList == "" || gradeList <= 0) {
+                document.getElementById("gradeIdErrorMessage").innerHTML = "Doğru bir sınıf ismi giriniz ...";
+                return false;
+            }
+            else {
+                document.getElementById("gradeIdErrorMessage").innerHTML = "";
+            }
+        });
+    </script>
+
+}
+

@@ -1,0 +1,150 @@
+﻿@model IEnumerable<StudentJoinGradeModel>
+
+@{
+    ViewData["Title"] = "GetAll";
+    string s = (string)ViewBag.SearchedWord;
+}
+
+<p>
+    <a asp-controller="Student" asp-action="Create" class="btn btn-lg btn-outline-primary">Öğrenci Ekle</a>
+</p>
+<br />
+
+<div class="border border-dark p-3 mb-2">
+    <strong>
+        Arama kutusundan istediğiniz her kelimeye göre arama yapabilirsiniz(Ders ismi, Öğrenci Sınıf, Öğrenci İsmi vs)
+    </strong>
+</div>
+@if (!string.IsNullOrWhiteSpace(s))
+{
+    <div class="border border-dark p-3 mb-2">
+        <strong>
+            @s
+        </strong> kelimesine ait öğrencileri görüyorsunuz.
+        <a asp-action="GetAll" class="float-right">Filtreyi kaldır</a>
+    </div>
+}
+
+
+<form method="get" asp-action="GetAll" class="text-right">
+    <input type="text" name="s" class="form-control-sm border border-primary border-top-0 border-left-0 border-right-0" style="margin-left: 490px;" />
+    <button type="submit" class="btn btn-primary btn-sm">Ara</button>
+</form>
+
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-sm-3 mt-3">
+                    <div class="card">
+                        <getstudentimage id="item.Id"></getstudentimage>
+                        <div class="card-body">
+                            <h5 class="card-title">@item.StudentName @item.StudentLastName</h5>
+                            <p class="card-text text-truncate" data-toggle="popover" data-content="@item.GradeName" data-trigger="hover"><b>Sınıfı: </b>@item.GradeName</p>
+                            <p class="card-text font-weight-bold text-primary"></p>
+                            <p class="card-text">
+                                <a data-whatever="@item.FkGradeId" class="btn btn-outline-secondary btn-sm" data-target="#viewLessons" data-toggle="modal">Dersleri Görüntüle</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">Güncelle</a>
+                                <a data-whatever="@item.Id" class="btn btn-outline-danger btn-sm" data-target="#deleteToStudent" data-toggle="modal">Sil</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <br />
+    <div class="pagination" style="text-align:right">
+        @for (int i = 1; i <= (int)ViewBag.TotalPage; i++)
+        {
+            <div class="page-item @(ViewBag.ActivePage==i?"active":"")">
+                <a asp-action="GetAll" asp-controller="Student" asp-route-activePage="@i" asp-route-s="@s" class="page-link">@i</a>
+            </div>
+        }
+
+    </div>
+</div>
+
+<div class="modal fade" id="viewLessons" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Öğrencinin Almış Olduğu Dersler</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" id="write">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="close" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DeleteModal -->
+<div class="modal fade" id="deleteToStudent" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Öğrenci Silme Ekranı</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Seçmiş olduğunuz öğrenciyi silmek istediğinizden eminmisiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="close" data-dismiss="modal">Kapat</button>
+                <button type="button" id="btnSil" class="btn btn-primary">Evet Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $("#deleteToStudent").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("whatever");
+
+            $("#btnSil").click(function () {
+                window.location.href = "http://localhost:53479/Student/Delete/" + id;
+            });
+
+        });
+
+        $("#viewLessons").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("whatever");
+
+            var url = "/Lesson/GetAllLessons/" + id;
+            $.getJSON(url, null, function (data) {
+                var item = "";
+                $("#write").empty();
+
+                document.getElementById("write").innerHTML = "Öğrencinin almış olduğu dersler.";
+                $.each(data, function (i, lesson) {
+                    item += 'Dersin İsmi:  ' + lesson.text + '</br>';
+                });
+
+                $("#write").show();
+                $("#write").html(item);
+            });
+
+        });
+
+    </script>
+}
+
+
+
+
+
+
+

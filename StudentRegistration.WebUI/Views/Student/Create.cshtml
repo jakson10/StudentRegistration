@@ -1,0 +1,143 @@
+﻿@model StudenAddDto
+
+@{
+    ViewData["Title"] = "Create";
+    string errorMessage = (string)ViewBag.ErrorMessage;
+}
+
+@if (errorMessage != null)
+{
+    <div class="border border-dark p-3 mb-2">
+        <strong style="color:red">
+            @errorMessage
+        </strong>
+    </div>
+}
+
+
+<div class="main-w3pvt mian-content-wthree text-center">
+    <div class="container" style="left:30%; right:30%">
+        <br />
+        <hr />
+        <div class="row">
+            <div class="col-md-4" style="left:30%; right:30%">
+                <form method="post" asp-action="Create" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label asp-for="StudentName" class="control-label">Öğrenci ismi</label>
+                        <input asp-for="StudentName" id="studentName" class="form-control" placeholder="Öğrenci ismi"/>
+                        <p id="studentNameErrorMessage" style="color:red"> </p>
+                        <span asp-validation-for="StudentName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StudentLastName" class="control-label">Öğrenci soyismi</label>
+                        <input asp-for="StudentLastName" id="studentLastName" class="form-control" placeholder="Öğrenci soyismi"/>
+                        <p id="studentLastNameErrorMessage" style="color:red"> </p>
+                        <span asp-validation-for="StudentLastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" id="brandListDiv">
+                        <label asp-for="FkGradeId">Sınıfı</label>
+                        <select asp-for="FkGradeId" id="gradeList" class="form-control">
+                        </select>
+                        <p id="gradeIdErrorMessage" style="color:red"> </p>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Image">Fotoğraf(Yüklenmez ise default bir fotoğraf atar)</label>
+                        <input class="form-control-file" type="file" asp-for="Image" id="file"
+                               onchange="Filevalidation()">
+                        <p id="size"></p>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="add_Btn" class="btn btn-block btn-info">Öğrenci Ekle</button>
+                    </div>
+                    <div>
+                        <a asp-controller="Student" asp-action="GetAll" class="btn btn-warning">Öğrenci Listesi</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.getJSON("/Grade/GetAllGrades", null, function (data) {
+                var item = "";
+                $("#gradeList").empty();
+
+                item += '<option value="0">-- Öğrenci Sınıfı Seçiniz --</option>';
+                $.each(data, function (i, parfume) {
+                    item += '<option value="' + parfume.value + '">' + parfume.text + '</option>'
+                });
+
+                $("#gradeList").show();
+                $("#gradeList").html(item);
+            });
+
+        });
+
+        $(document).on('click', '#add_Btn', function (e) {
+
+            var studentName = $("#studentName").val();
+            var studentLastName = $("#studentLastName").val();
+            var gradeId = $("#brandList").val();
+
+
+            if (studentName == "" && studentLastName == "" && (gradeId == "" || gradeId == 0)) {
+                document.getElementById("studentNameErrorMessage").innerHTML = "Öğrenci İsmi Boş Geçilemez...";
+                document.getElementById("studentLastNameErrorMessage").innerHTML = "Öğrenci Soyismi Boş Geçilemez...";
+                document.getElementById("gradeIdErrorMessage").innerHTML = "Lütfen geçerli bir sınıf seçiniz...";
+                return false;
+            }
+            else {
+                document.getElementById("studentNameErrorMessage").innerHTML = "";
+                document.getElementById("studentLastNameErrorMessage").innerHTML = "";
+                document.getElementById("gradeIdErrorMessage").innerHTML = "";
+            }
+            if (studentName == "") {
+                document.getElementById("studentNameErrorMessage").innerHTML = "Öğrenci İsmi Boş Geçilemez...";
+                return false;
+            }
+            else {
+                document.getElementById("studentNameErrorMessage").innerHTML = "";
+            }
+            if (studentLastName == "") {
+                document.getElementById("studentLastNameErrorMessage").innerHTML = "Öğrenci Soyismi Boş Geçilemez...";
+                return false;
+            }
+            else {
+                document.getElementById("studentLastNameErrorMessage").innerHTML = "";
+            }
+
+            if (gradeId == "" || gradeId == 0) {
+                document.getElementById("gradeIdErrorMessage").innerHTML = "Lütfen geçerli bir sınıf seçiniz...";
+                return false;
+            }
+            else {
+                document.getElementById("gradeIdErrorMessage").innerHTML = "";
+            }
+        });
+
+        Filevalidation = () => {
+            const fi = document.getElementById('file');
+            // Check if any file is selected.
+            if (fi.files.length > 0) {
+                for (const i = 0; i <= fi.files.length - 1; i++) {
+
+                    const fsize = fi.files.item(i).size;
+                    const file = Math.round((fsize / 1024));
+                    // The size of the file.
+                    if (file >= 1024) {
+                        document.getElementById("size").innerHTML = "Dosya boyutu 1mb'tan düşük olmalıdır.";
+                        return false;
+                    } else {
+                        document.getElementById("size").innerHTML = "";
+                    }
+                }
+            }
+        }
+
+    </script>
+}
+
+

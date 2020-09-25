@@ -1,0 +1,108 @@
+﻿@model LessonDto
+
+@{
+    ViewData["Title"] = "Edit";
+    string errorMessage = (string)ViewBag.ErrorMessage;
+}
+
+@if (errorMessage != null)
+{
+    <div class="border border-dark p-3 mb-2">
+        <strong style="color:red">
+            @errorMessage
+        </strong>
+    </div>
+}
+
+<div class="main-w3pvt mian-content-wthree text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4" style="left:30%; right:30%">
+                <h3>Ders güncelle</h3>
+                <hr />
+                <form method="post" asp-action="Edit" class="p-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input type="hidden" asp-for="Id" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LessonName" class="control-label">Sınıf İsim</label>
+                        <input asp-for="LessonName" type="text" id="gradeName" class="form-control" placeholder="Sınıf İsmi" />
+                        <p id="lessonNameErrorMessage" style="color:red"> </p>
+                        <span asp-validation-for="LessonName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" id="brandListDiv">
+                        <label asp-for="FkGradeId">Sınıf İsimleri</label>
+                        <select asp-for="FkGradeId" id="gradeList" class="form-control">
+                        </select>
+                        <p id="gradeIdErrorMessage" style="color:red"> </p>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="update_Btn" class="btn btn-block btn-info">Güncelle</button>
+                    </div>
+                    <div>
+                        <a asp-action="GetAll" class="btn btn-warning">Listeye geri dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $.getJSON("/Grade/GetAllGrades", null, function (data) {
+                var item = "";
+                $("#gradeList").empty();
+
+                item += '<option value="0">-- Sınıf İsmi Seçiniz --</option>';
+                $.each(data, function (i, grade) {
+                    if (grade.value == @Model.FkGradeId) {
+                        item += '<option value="' + grade.value + '" selected>' + grade.text + '</option>'
+                    }
+                    else {
+                        item += '<option value="' + grade.value + '">' + grade.text + '</option>'
+                    }
+                });
+
+                $("#gradeList").show();
+                $("#gradeList").html(item);
+            });
+
+        });
+
+        $(document).on('click', '#update_Btn', function (e) {
+
+            var lessonName = $("#lessonName").val();
+            var gradeId = $("#gradeList").val();
+
+            if (lessonName == "" && (gradeId == "" || gradeId <= 0)){
+                document.getElementById("lessonNameErrorMessage").innerHTML = "Ders İsmi Boş Geçilemez...";
+                document.getElementById("gradeIdErrorMessage").innerHTML = "Doğru bir sınıf ismi giriniz ...";
+                return false;
+            }
+            else {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "";
+                document.getElementById("gradeIdErrorMessage").innerHTML = "";
+            }
+            if (lessonName == "") {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "Ders İsmi Boş Geçilemez...";
+                return false;
+            }
+            else {
+                document.getElementById("lessonNameErrorMessage").innerHTML = "";
+            }
+            if (gradeId == "" || gradeId <= 0) {
+                document.getElementById("gradeIdErrorMessage").innerHTML = "Doğru bir sınıf ismi giriniz ...";
+                return false;
+            }
+            else {
+                document.getElementById("gradeIdErrorMessage").innerHTML = "";
+            }
+        });
+    </script>
+
+}
+

@@ -1,0 +1,70 @@
+﻿@model List<GradeDto>
+
+@{
+    ViewData["Title"] = "GetAll";
+}
+
+<p>
+    <a asp-controller="Grade" asp-action="Create" class="btn btn-lg btn-outline-primary">Sınıf Ekle</a>
+</p>
+<br />
+
+<h3>Sınıflarım</h3>
+<hr />
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Sınıf İsmi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.GradeName</td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Grade" asp-route-id="@item.Id" class="btn btn-outline-info btn-group-lg">Güncelle</a>
+                    <a data-whatever="@item.Id" class="btn btn-outline-danger btn-group-lg" data-target="#deleteToGrade" data-toggle="modal">Sil</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<!-- DeletModel -->
+<div class="modal fade" id="deleteToGrade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sınıf Silme Ekranı</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Seçmiş olduğunuz sınıfı silmek istediğinizden eminmisiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="close" data-dismiss="modal">Kapat</button>
+                <button type="button" id="btnSil" class="btn btn-primary">Evet Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+
+        $("#deleteToGrade").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("whatever");
+
+            $("#btnSil").click(function () {
+                window.location.href = "http://localhost:53479/Grade/Delete/" + id;
+            });
+
+        });
+
+    </script>
+}

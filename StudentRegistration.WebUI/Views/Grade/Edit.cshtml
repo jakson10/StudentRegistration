@@ -1,0 +1,61 @@
+﻿@model GradeDto
+
+@{
+    ViewData["Title"] = "Edit";
+    string errorMessage = (string)ViewBag.ErrorMessage;
+}
+
+@if (errorMessage != null)
+{
+    <div class="border border-dark p-3 mb-2">
+        <strong style="color:red">
+            @errorMessage
+        </strong>
+    </div>
+}
+
+<div class="main-w3pvt mian-content-wthree text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4" style="left:30%; right:30%">
+                <h3>Sınıf güncelle</h3>
+                <hr />
+                <form method="post" asp-action="Edit" class="p-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input type="hidden" asp-for="Id" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="GradeName" class="control-label">Sınıf İsim</label>
+                        <input asp-for="GradeName" type="text" id="gradeName" class="form-control" placeholder="Sınıf İsmi" />
+                        <p id="gradeNameErrorMessage" style="color:red"> </p>
+                        <span asp-validation-for="GradeName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="update_Btn" class="btn btn-block btn-info">Güncelle</button>
+                    </div>
+                    <div>
+                        <a asp-action="GetAll" class="btn btn-warning">Listeye geri dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).on('click', '#update_Btn', function (e) {
+            var gradeName = $("#gradeName").val();
+
+            if (gradeName == "") {
+                document.getElementById("gradeNameErrorMessage").innerHTML = "Sınıf İsmi Boş Geçilemez...";
+                return false;
+            }
+            else {
+                document.getElementById("gradeNameErrorMessage").innerHTML = "";
+            }
+        });
+    </script>
+
+}
